@@ -36,6 +36,7 @@ Parameters:
     Default: https://github.com/joemaster9/timeoff-management-application
 
 Resources:
+
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -73,7 +74,7 @@ Resources:
               - s3:PutObject*
             Resource: !Join ['', ['arn:aws:s3:::', !Ref 'S3Bucket', /*]]
 
-  MyBuild:
+  CodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
       TimeoutInMinutes: 60
@@ -96,7 +97,7 @@ Resources:
         - Name: AWS_ACCOUNT_ID
           Value: !Ref AWS::AccountId
         - Name: IMAGE_REPO_NAME
-          Value: !Ref MyRepository
+          Value: !Ref ECRRepository
         - Name: IMAGE_TAG
           Value: latest
         ImagePullCredentialsType: CODEBUILD
@@ -184,9 +185,9 @@ Resources:
               - ecr:BatchGetImage
               - ecr:GetDownloadUrlForLayer
               Resource: 
-               - !GetAtt MyRepository.Arn
+               - !GetAtt ECRRepository.Arn
 
-  MyRepository: 
+  ECRRepository: 
     Type: AWS::ECR::Repository
     Properties: 
       RepositoryName: timeoff-mgmt-app-repo
@@ -198,7 +199,6 @@ Resources:
             Effect: Allow
             Principal: 
               Service: codebuild.amazonaws.com
-              # AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action: 
               - "ecr:GetDownloadUrlForLayer"
               - "ecr:BatchGetImage"
@@ -208,8 +208,24 @@ Resources:
               - "ecr:UploadLayerPart"
               - "ecr:CompleteLayerUpload"
               - "ecr:GetAuthorizationToken"
-              # - "ecr:*"
             
+  # ECSCluster:
+  #   Type: 'AWS::ECS::Cluster'
+  #   Properties:
+  #     ClusterName: timeoff-mgmt-app-cluster
+  #     CapacityProviders:
+  #       - FARGATE
+  #         FARGATE_SPOT
+  #     DefaultCapacityProviderStrategy:
+  #       - CapacityProvider: FARGATE
+  #         Weight: 1
+  #       - CapacityProvider: FARGATE_SPOT
+  #         Weight: 1
+
+
+
+
+
   # CodePipelineRole:
   #   Type: 'AWS::IAM::Role'
   #   Properties:
