@@ -39,12 +39,20 @@ Parameters:
     Description: VPC id for ALB.
     Type: AWS::EC2::VPC::Id
 
-  Subnetid1:
+  ALBSubnetid1:
     Description: Subnets ids for ALB.
     Type: AWS::EC2::Subnet::Id
 
-  Subnetid2:
+  ALBSubnetid2:
     Description: Subnets ids for ALB.
+    Type: AWS::EC2::Subnet::Id
+
+  ServiceSubnetid1:
+    Description: Subnets ids for ECS Service.
+    Type: AWS::EC2::Subnet::Id
+
+  ServiceSubnetid2:
+    Description: Subnets ids for ECS Service.
     Type: AWS::EC2::Subnet::Id
 
 Resources:
@@ -211,6 +219,7 @@ Resources:
             Effect: Allow
             Principal: 
               Service: codebuild.amazonaws.com
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
             Action: 
               - "ecr:GetDownloadUrlForLayer"
               - "ecr:BatchGetImage"
@@ -262,11 +271,12 @@ Resources:
     Properties: 
       Name: timeoff-mgm-app-alb
       Scheme: internet-facing
+      IpAddressType: ipv4
       SecurityGroups: 
         - !GetAtt SecurityGroup.GroupId
       Subnets: 
-        - !Ref Subnetid1
-        - !Ref Subnetid2
+        - !Ref ALBSubnetid1
+        - !Ref ALBSubnetid2
       Type: application
 
   ALBListener:
@@ -278,7 +288,7 @@ Resources:
             Ref: ALBTargetGroup
       LoadBalancerArn:
           Ref: AppLoadBalancer
-      Port: 80
+      Port: 3000
       Protocol: HTTP
 
   ALBTargetGroup:
@@ -299,12 +309,55 @@ Resources:
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
+        ToPort: 3000
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 3000
+        CidrIp: 0.0.0.0/0
+
+  ECSService: 
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: timeoff-mgmt-app-service
+      Cluster: 
+        Ref: "ECSCluster"
+      DesiredCount: 1
+      TaskDefinition: 
+        Ref: "TaskDefinition"
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups: 
+            - !GetAtt ECSSecurityGroup.GroupId
+          Subnets:
+            # - !Ref ALBSubnetid1
+            # - !Ref ALBSubnetid2
+            - !Ref ServiceSubnetid1
+            - !Ref ServiceSubnetid2
+      LoadBalancers:
+      - TargetGroupArn:
+          Ref: ALBTargetGroup
+        ContainerPort: 3000
+        ContainerName: timeoff-mgmt-app-container
+
+  ECSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to app
+      VpcId:
+          Ref: VPCid
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 80
-        ToPort: 80
+        ToPort: 3000
         CidrIp: 0.0.0.0/0
 
   # CodePipelineRole:
