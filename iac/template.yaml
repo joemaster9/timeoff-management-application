@@ -144,7 +144,7 @@ Resources:
   CodeBuildIAMRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: codebuild-TimeoffMGMTApp-service-role
+      RoleName: timeoff-mgmt-app-codebuild-service-role
       ManagedPolicyArns: 
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
       AssumeRolePolicyDocument:
