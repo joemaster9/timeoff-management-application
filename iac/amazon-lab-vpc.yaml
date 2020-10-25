@@ -1,0 +1,239 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Amazon Lab Sample VPC'
+
+Parameters:
+
+  VpcLab:
+    Type: String
+    Default: 10.168.0.0/16
+    Description: The CIDR range for the VPC. This should be a valid private (RFC 1918) CIDR range.
+
+  Subnet01Lab:
+    Type: String
+    Default: 10.168.1.0/24
+    Description: CidrBlock for subnet 01 within the VPC
+
+  Subnet02Lab:
+    Type: String
+    Default: 10.168.2.0/24
+    Description: CidrBlock for subnet 02 within the VPC
+
+  Subnet03Lab:
+    Type: String
+    Default: 10.168.3.0/24
+    Description: CidrBlock for subnet 03 within the VPC. This is used only if the region has more than 2 AZs.
+  
+  Subnet04Lab:
+    Type: String
+    Default: 10.168.4.0/24
+    Description: CidrBlock for subnet 04 within the VPC. This is used only if the region has more than 2 AZs.
+
+Conditions:
+  Has2Azs:
+    Fn::Or:
+      - Fn::Equals:
+        - {Ref: 'AWS::Region'}
+        - ap-south-1
+      - Fn::Equals:
+        - {Ref: 'AWS::Region'}
+        - ap-northeast-2
+      - Fn::Equals:
+        - {Ref: 'AWS::Region'}
+        - ca-central-1
+      - Fn::Equals:
+        - {Ref: 'AWS::Region'}
+        - cn-north-1
+
+  HasMoreThan2Azs:
+    Fn::Not:
+      - Condition: Has2Azs
+
+Resources:
+VPCTest:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:  !Ref VpcLab
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}-VPC-Lab'
+  EIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: "vpc"     
+
+  InternetGatewayTest:
+    Type: "AWS::EC2::InternetGateway"
+    Properties:
+      Tags:
+      - Key: "Capacitacion"
+        Value: "Cloudformation" 
+  
+  NatGatewayTest:
+    Type: "AWS::EC2::NatGateway"
+    Properties:
+      SubnetId: !Ref Subnet01Test
+      AllocationId: !Ref AllocationId
+
+  VPCGatewayAttachmentTest:
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties:
+      InternetGatewayId: !Ref InternetGatewayTest
+      VpcId: !Ref VPCTest
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCTest
+      Tags:
+      - Key: Name
+        Value: Public Subnets for Lab
+      - Key: Network
+        Value: Public
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCTest
+      Tags:
+      - Key: Name
+        Value: Private Subnets for Lab
+      - Key: Network
+        Value: Private
+
+  PublicRoute:
+    DependsOn: VPCGatewayAttachmentTest
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGatewayTest
+
+  PrivateRoute:
+    DependsOn: VPCGatewayAttachmentTest
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGatewayTest
+
+  Subnet01Test:
+    Type: AWS::EC2::Subnet
+    Metadata:
+      Comment: Subnet 01
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '0'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock:
+        Ref: Subnet01Lab
+      VpcId:
+        Ref: VPCTest
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-Subnet01Lab-Public"
+
+  Subnet02Test:
+    Type: AWS::EC2::Subnet
+    Metadata:
+      Comment: Subnet 02
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '1'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock:
+        Ref: Subnet02Lab
+      VpcId:
+        Ref: VPCTest
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-Subnet02Lab-Private"
+
+  Subnet03Test:
+    Condition: HasMoreThan2Azs
+    Type: AWS::EC2::Subnet
+    Metadata:
+      Comment: Subnet 03
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '2'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock:
+        Ref: Subnet03Lab
+      VpcId:
+        Ref: VPCTest
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-Subnet03Lab-Public"
+      - Key: "Capacitacion"
+        Value: "Cloudformation" 
+
+  Subnet04Test:
+    Condition: HasMoreThan2Azs
+    Type: AWS::EC2::Subnet
+    Metadata:
+      Comment: Subnet 04
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+        - '3'
+        - Fn::GetAZs:
+            Ref: AWS::Region
+      CidrBlock:
+        Ref: Subnet04Lab
+      VpcId:
+        Ref: VPCTest
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: Name
+        Value: !Sub "${AWS::StackName}-Subnet04Lab-Private"
+      - Key: "Capacitacion"
+        Value: "Cloudformation" 
+
+  Subnet01RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet01Test
+      RouteTableId: !Ref PublicRouteTable
+
+  Subnet02RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet02Test
+      RouteTableId: !Ref PrivateRouteTable
+
+  Subnet03RouteTableAssociation:
+    Condition: HasMoreThan2Azs
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet03Test
+      RouteTableId: !Ref PublicRouteTable
+
+  Subnet04RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet04Test
+      RouteTableId: !Ref PrivateRouteTable
+
+Outputs:
+
+  SubnetIds:
+    Description: All subnets in the VPC
+    Value:
+      Fn::If:
+      - HasMoreThan2Azs
+      - !Join [ ",", [ !Ref Subnet01Test, !Ref Subnet02Test, !Ref Subnet03Test, !Ref Subnet04Test ] ]
+      - !Join [ ",", [ !Ref Subnet01Test, !Ref Subnet02Test ] ]
+
+  VpcId:
+    Description: The VPC Id
+    Value: !Ref VPCTest
