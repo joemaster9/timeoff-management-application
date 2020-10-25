@@ -122,6 +122,46 @@ npm run-script db-update
 npm start
 ```
 
+## Solution
+For this scenario we will use some of the most useful and intuitive AWS services that give us facility to implement an CI/CD automation. Some of those services will be:
+### AWS CodePipeline
+
+AWS CodePipeline is a fully managed continuous delivery service that helps you automate your release pipelines for fast and reliable application and infrastructure updates. CodePipeline automates the build, test, and deploy phases of your release process every time there is a code change, based on the release model you define.
+
+### AWS CodeBuild
+
+AWS CodeBuild is a fully managed continuous integration service that compiles source code, runs tests, and produces software packages that are ready to deploy. With CodeBuild, you don’t need to provision, manage, and scale your own build servers
+
+### Amazon Elastic Container Registry
+
+Amazon Elastic Container Registry (ECR) is a fully-managed Docker container registry that makes it easy for developers to store, manage, and deploy Docker container images. Amazon ECR is integrated with Amazon Elastic Container Service (ECS), simplifying your development to production workflow. Amazon ECR eliminates the need to operate your own container repositories or worry about scaling the underlying infrastructure
+
+### Amazon Elastic Container Service
+
+Amazon Elastic Container Service (Amazon ECS) is a fully managed container orchestration service. ECS is a great choice to run containers for several reasons. One of the most important is that you can choose to run your ECS clusters using AWS Fargate, which is serverless compute for containers. Fargate removes the need to provision and manage servers, lets you specify and pay for resources per application, and improves security through application isolation by design.
+
+### AWS CloudFormation
+
+AWS CloudFormation gives you an easy way to model a collection of related AWS and third-party resources, provision them quickly and consistently, and manage them throughout their lifecycles, by treating infrastructure as code. A CloudFormation template describes your desired resources and their dependencies so you can launch and configure them together as a stack. You can use a template to create, update, and delete an entire stack as a single unit, as often as you need to, instead of managing resources individually.
+
+## Diagrams
+
+The Following diagram shows the CI/CD flow used for this scenario 
+(IMAGEN)
+
+The Following diagram shows the Infrastructure used for this scenario
+(IMAGEN)
+
+## Deploying the infrastructure
+
+### Prerequisites 
+
+Because we will integrate a GitHub repository with AWS CodeBuild, first, me must create a connection between these 2 platforms. For this we’ll follow the steps that are defined in the following documentation
+https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
+This operation isn’t allowed to be automated because it must be performed using your GitHub credentials and it will only be executed once.
+Once we have the connection created, it will be something like this:
+![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/github-connection.png)
+
 
 ## Feedback
 
