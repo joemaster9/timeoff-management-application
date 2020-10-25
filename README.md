@@ -175,6 +175,48 @@ First of all we will need to create an Cloudformation Stack with the “amazon-l
 
 The second part of this deployment will be the “template.yaml” template that will contain the infrastructure necessary to run CI/CD services and our application successfully.
 
+### Defining the Build specification
+
+A buildspec is a collection of build commands and related settings, in YAML format, that CodeBuild uses to run a build. You can include a buildspec as part of the source code or you can define a buildspec when you create a build project. By default, the buildspec file must be named buildspec.yml and placed in the root of our source directory.
+
+We will use this Buildspec to login to ECR, build a docker image with the Dockerfile, assign a tag for this image, push the image to a defined ECR repository an create a “imagedefinition.json” file just for testing the artifact creation. The code below uses environment variables provided at the creation of the build project in the cloudformation template.
+
+```yaml
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo Writing image definitions file... 
+      - printf '[{"name":"timeoff-mgmt-app-container","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json 
+
+artifacts:
+  files:
+    - imagedefinitions.json
+```
+
+When all the process is done, we can check that the Pipeline’s stages where executed successfully in the AWS console
+![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/pipeline-snapshot.png)
+
+Lastly, we could see that the application running when we put the DNS created by the Application Load Balancer.
+URL: timeoff-mgm-app-alb-804067693.us-east-1.elb.amazonaws.com
+![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/app-screenshot.png)
+
+
 ## Feedback
 
 Please report any issues or feedback to <a href="https://twitter.com/FreeTimeOffApp">twitter</a> or Email: pavlo at timeoff.management
