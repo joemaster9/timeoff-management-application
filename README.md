@@ -213,7 +213,8 @@ When all the process is done, we can check that the Pipeline’s stages where ex
 ![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/pipeline-snapshot.png)
 
 Lastly, we could see that the application running when we put the DNS created by the Application Load Balancer.
-URL: timeoff-mgm-app-alb-804067693.us-east-1.elb.amazonaws.com
+
+URL: http://timeoff-mgm-app-alb-804067693.us-east-1.elb.amazonaws.com
 ![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/app-screenshot.png)
 
 
