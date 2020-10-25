@@ -39,21 +39,14 @@ Parameters:
     Description: VPC id for ALB.
     Type: AWS::EC2::VPC::Id
 
-  ALBSubnetid1:
+  Subnetid1:
     Description: Subnets ids for ALB.
     Type: AWS::EC2::Subnet::Id
 
-  ALBSubnetid2:
+  Subnetid2:
     Description: Subnets ids for ALB.
     Type: AWS::EC2::Subnet::Id
 
-  ServiceSubnetid1:
-    Description: Subnets ids for ECS Service.
-    Type: AWS::EC2::Subnet::Id
-
-  ServiceSubnetid2:
-    Description: Subnets ids for ECS Service.
-    Type: AWS::EC2::Subnet::Id
 
 Resources:
 
@@ -255,8 +248,8 @@ Resources:
           Name: timeoff-mgmt-app-container
           PortMappings: 
             - 
-              ContainerPort: "3000"
-              Protocol: "tcp"
+              ContainerPort: 3000
+              Protocol: tcp
       Family: "timeoff-mgmt-app-td"
       ExecutionRoleArn: !Sub "arn:aws:iam::${AWS::AccountId}:role/ecsTaskExecutionRole"
       NetworkMode: "awsvpc"
@@ -275,8 +268,8 @@ Resources:
       SecurityGroups: 
         - !GetAtt SecurityGroup.GroupId
       Subnets: 
-        - !Ref ALBSubnetid1
-        - !Ref ALBSubnetid2
+        - !Ref Subnetid1
+        - !Ref Subnetid2
       Type: application
 
   ALBListener:
@@ -288,7 +281,7 @@ Resources:
             Ref: ALBTargetGroup
       LoadBalancerArn:
           Ref: AppLoadBalancer
-      Port: 3000
+      Port: 80
       Protocol: HTTP
 
   ALBTargetGroup:
@@ -299,6 +292,7 @@ Resources:
       Protocol: HTTP
       TargetType: ip
       VpcId: !Ref VPCid
+      HealthCheckIntervalSeconds: 300
 
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -309,12 +303,10 @@ Resources:
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 80
-        ToPort: 3000
+        ToPort: 80
         CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 3000
+      - IpProtocol: -1
         CidrIp: 0.0.0.0/0
 
   ECSService: 
@@ -323,20 +315,19 @@ Resources:
       ServiceName: timeoff-mgmt-app-service
       Cluster: 
         Ref: "ECSCluster"
-      DesiredCount: 1
+      DesiredCount: 2
       TaskDefinition: 
         Ref: "TaskDefinition"
       LaunchType: FARGATE
+      HealthCheckGracePeriodSeconds: 2147483647
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups: 
             - !GetAtt ECSSecurityGroup.GroupId
           Subnets:
-            # - !Ref ALBSubnetid1
-            # - !Ref ALBSubnetid2
-            - !Ref ServiceSubnetid1
-            - !Ref ServiceSubnetid2
+            - !Ref Subnetid1
+            - !Ref Subnetid2
       LoadBalancers:
       - TargetGroupArn:
           Ref: ALBTargetGroup
@@ -351,13 +342,11 @@ Resources:
           Ref: VPCid
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
+        FromPort: 3000
+        ToPort: 3000
         CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 3000
+      - IpProtocol: -1
         CidrIp: 0.0.0.0/0
 
   # CodePipelineRole:
