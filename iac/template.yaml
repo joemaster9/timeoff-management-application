@@ -71,7 +71,7 @@ Resources:
         BlockPublicPolicy: True
         RestrictPublicBuckets: True
    
-  S3PublicBucketPolicy: 
+  S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties: 
       Bucket: !Ref S3Bucket
@@ -197,8 +197,12 @@ Resources:
               - ecr:UploadLayerPart
               - ecr:BatchGetImage
               - ecr:GetDownloadUrlForLayer
-              Resource: 
+              Resource:
                - !GetAtt ECRRepository.Arn
+            - Effect: Allow
+              Action: codestar-connections:UseConnection
+              Resource: arn:aws:codestar-connections:us-east-1:339537344181:connection/561a6431-c3f4-43bb-bf5f-d64c85a5617f
+
 
   ECRRepository: 
     Type: AWS::ECR::Repository
@@ -349,111 +353,110 @@ Resources:
       - IpProtocol: -1
         CidrIp: 0.0.0.0/0
 
-  CodePipelineRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: codepipeline.amazonaws.com
-            Action: 'sts:AssumeRole'
-      Path: /
-      Policies:
-        - PolicyName: Manage_CodePipeline
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-        - Effect: Allow
-          Action:
-            - 's3:GetObject'
-            - 's3:GetObjectVersion'
-            - 's3:GetBucketVersioning'
-            - 's3:PutObject'
-            - "s3:GetBucketAcl"
-            - "s3:GetBucketLocation"
-          Resource:
-            - !GetAtt S3Bucket.Arn
-            - !Sub "${S3Bucket.Arn}/*"
-          Effect: Allow
-        - Action:
-            - 'iam:PassRole'
-          Resource: '*'
-          Effect: Allow
-        - Action:
-            - 'codebuild:BatchGetBuilds'
-            - 'codebuild:StartBuild'
-          Resource: '*'
-          Effect: Allow
-        - Action:
-          - 'kms:Encrypt'
-          - 'kms:Decrypt'
-          - 'kms:ReEncrypt*'
-          - 'kms:GenerateDataKey*'
-          - 'kms:DescribeKey'
-          Resource: !GetAtt KMSKey.Arn
-          Effect: Allow
-        - Action:
-            - 'secretsmanager:GetSecretValue'
-          Resource: !Ref SecretsManagerArnForSSHPrivateKey
-          Effect: Allow
-        Version: 2012-10-17
+  # CodePipelineRole:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: codepipeline.amazonaws.com
+  #           Action: 'sts:AssumeRole'
+  #     Path: /
+  #     Policies:
+  #       - PolicyName: Manage_CodePipeline
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #           - Effect: Allow
+  #             Action:
+  #               - 's3:GetObject'
+  #               - 's3:GetObjectVersion'
+  #               - 's3:GetBucketVersioning'
+  #               - 's3:PutObject'
+  #               - "s3:GetBucketAcl"
+  #               - "s3:GetBucketLocation"
+  #             Resource:
+  #               - !GetAtt S3Bucket.Arn
+  #               - !Sub "${S3Bucket.Arn}/*"
+  #             Effect: Allow
+  #           - Action:
+  #               - 'iam:PassRole'
+  #             Resource: '*'
+  #             Effect: Allow
+  #           - Action:
+  #               - 'codebuild:BatchGetBuilds'
+  #               - 'codebuild:StartBuild'
+  #             Resource: '*'
+  #             Effect: Allow
+  #           - Action:
+  #             - 'kms:Encrypt'
+  #             - 'kms:Decrypt'
+  #             - 'kms:ReEncrypt*'
+  #             - 'kms:GenerateDataKey*'
+  #             - 'kms:DescribeKey'
+  #             Resource: !GetAtt KMSKey.Arn
+  #             Effect: Allow
+  #           - Action:
+  #               - 'secretsmanager:GetSecretValue'
+  #             Resource: !Ref SecretsManagerArnForSSHPrivateKey
+  #             Effect: Allow
 
-  CodePipeline:
-    Type: 'AWS::CodePipeline::Pipeline'
-    Properties:
-      ArtifactStore:
-        Type: S3
-        Location: !Ref S3Bucket
-        EncryptionKey:
-          Id: !GetAtt KMSKey.Arn
-          Type: KMS
-      Name: !Ref CodePipelineName
-      RoleArn: !GetAtt PipelineRole.Arn
-      Stages:
-        - Name: 'Source'
-          Actions:
-            - Name: 'Source'
-              ActionTypeId:
-                Category: 'Source'
-                Owner: 'Custom'
-                Version: !Ref SourceActionVersion
-                Provider: !Ref SourceActionProvider
-              OutputArtifacts:
-                - Name: MyApp
-              Configuration:
-                Branch: !Ref Branch
-                GitUrl: !Ref GitUrl
-                PipelineName: !Ref CodePipelineName
-                SSHSecretKeyName: !Ref SecretsManagerArnForSSHPrivateKey
-              RunOrder: 1
-        - Name: 'Build'
-          Actions:
-            - Name: 'CodeBuild'
-              ActionTypeId:
-                Category: 'Build'
-                Owner: 'AWS'
-                Version: '1'
-                Provider: 'CodeBuild'
-              InputArtifacts:
-                - Name: MyApp
-              OutputArtifacts:
-                - Name: MyAppBuilt
-              Configuration:
-                ProjectName: !Ref CodeBuild
-              RunOrder: 1
+  # CodePipeline:
+  #   Type: 'AWS::CodePipeline::Pipeline'
+  #   Properties:
+  #     ArtifactStore:
+  #       Type: S3
+  #       Location: !Ref S3Bucket
+  #       EncryptionKey:
+  #         Id: !GetAtt KMSKey.Arn
+  #         Type: KMS
+  #     Name: !Ref CodePipelineName
+  #     RoleArn: !GetAtt PipelineRole.Arn
+  #     Stages:
+  #       - Name: 'Source'
+  #         Actions:
+  #           - Name: 'Source'
+  #             ActionTypeId:
+  #               Category: 'Source'
+  #               Owner: 'Custom'
+  #               Version: !Ref SourceActionVersion
+  #               Provider: !Ref SourceActionProvider
+  #             OutputArtifacts:
+  #               - Name: MyApp
+  #             Configuration:
+  #               Branch: !Ref Branch
+  #               GitUrl: !Ref GitUrl
+  #               PipelineName: !Ref CodePipelineName
+  #               SSHSecretKeyName: !Ref SecretsManagerArnForSSHPrivateKey
+  #             RunOrder: 1
+  #       - Name: 'Build'
+  #         Actions:
+  #           - Name: 'CodeBuild'
+  #             ActionTypeId:
+  #               Category: 'Build'
+  #               Owner: 'AWS'
+  #               Version: '1'
+  #               Provider: 'CodeBuild'
+  #             InputArtifacts:
+  #               - Name: MyApp
+  #             OutputArtifacts:
+  #               - Name: MyAppBuilt
+  #             Configuration:
+  #               ProjectName: !Ref CodeBuild
+  #             RunOrder: 1
 
-  CodePipelineWebhook:
-    Type: "AWS::CodePipeline::Webhook"
-    Properties:
-      TargetPipeline: !Ref Pipeline
-      TargetPipelineVersion: 1
-      TargetAction: Source
-      Filters:
-        - JsonPath: '$.ref'
-          MatchEquals: 'refs/heads/{Branch}'
-      Authentication: IP
-      AuthenticationConfiguration:
-        AllowedIPRange: !Ref GitWebHookIpAddress
-      RegisterWithThirdParty: false
+  # CodePipelineWebhook:
+  #   Type: "AWS::CodePipeline::Webhook"
+  #   Properties:
+  #     TargetPipeline: !Ref Pipeline
+  #     TargetPipelineVersion: 1
+  #     TargetAction: Source
+  #     Filters:
+  #       - JsonPath: '$.ref'
+  #         MatchEquals: 'refs/heads/{Branch}'
+  #     Authentication: IP
+  #     AuthenticationConfiguration:
+  #       AllowedIPRange: !Ref GitWebHookIpAddress
+  #     RegisterWithThirdParty: false
