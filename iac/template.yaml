@@ -427,6 +427,7 @@ Resources:
                 FullRepositoryId: "joemaster9/timeoff-management-application"
                 BranchName: "master"
               Region: !Ref AWS::Region
+              RunOrder: 1
         - Name: 'Build'
           Actions:
             - Name: 'Build'
@@ -442,6 +443,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref CodeBuild
               Region: !Ref AWS::Region
+              RunOrder: 2
         - Name: 'Deploy'
           Actions:
             - Name: 'Deploy'
@@ -454,6 +456,7 @@ Resources:
                 ClusterName: !Ref ECSCluster
                 ServiceName: !Ref ECSService
               Region: !Ref AWS::Region
+              RunOrder: 3
               InputArtifacts: 
                 - 
                   Name: "BuildArtifact"
