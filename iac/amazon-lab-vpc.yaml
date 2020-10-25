@@ -4,6 +4,10 @@ Description: 'Amazon Lab Sample VPC'
 
 Parameters:
 
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+
   VpcLab:
     Type: String
     Default: 10.168.0.0/16
@@ -50,7 +54,7 @@ Conditions:
       - Condition: Has2Azs
 
 Resources:
-VPCTest:
+  VPCTest:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock:  !Ref VpcLab
@@ -68,14 +72,14 @@ VPCTest:
     Type: "AWS::EC2::InternetGateway"
     Properties:
       Tags:
-      - Key: "Capacitacion"
-        Value: "Cloudformation" 
+      - Key: Name
+        Value: !Ref EnvironmentName
   
   NatGatewayTest:
     Type: "AWS::EC2::NatGateway"
     Properties:
       SubnetId: !Ref Subnet01Test
-      AllocationId: !Ref AllocationId
+      AllocationId: !GetAtt EIP.AllocationId
 
   VPCGatewayAttachmentTest:
     Type: "AWS::EC2::VPCGatewayAttachment"
@@ -121,8 +125,6 @@ VPCTest:
 
   Subnet01Test:
     Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 01
     Properties:
       AvailabilityZone:
         Fn::Select:
@@ -139,8 +141,6 @@ VPCTest:
 
   Subnet02Test:
     Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 02
     Properties:
       AvailabilityZone:
         Fn::Select:
@@ -158,8 +158,6 @@ VPCTest:
   Subnet03Test:
     Condition: HasMoreThan2Azs
     Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 03
     Properties:
       AvailabilityZone:
         Fn::Select:
@@ -180,8 +178,6 @@ VPCTest:
   Subnet04Test:
     Condition: HasMoreThan2Azs
     Type: AWS::EC2::Subnet
-    Metadata:
-      Comment: Subnet 04
     Properties:
       AvailabilityZone:
         Fn::Select:
