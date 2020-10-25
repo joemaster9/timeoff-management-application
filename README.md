@@ -161,19 +161,19 @@ Because we will integrate a GitHub repository with AWS CodeBuild, first, me must
 https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
 
 This operation isn’t allowed to be automated because it must be performed using your GitHub credentials and it will only be executed once.
-Once we have the connection created, it will be something like this:
+Once we have the connection created, we will get something like this:
 ![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/github-connection.png)
 
 The ARN of this connection will be used in the CodeBuild Service Role to allow a full clone when a change is made in the reposiroty.
 
 ### Deploying the infrastructure as code on AWS
 
-In this section, we will deploy the necessary resources to run our application and the CI/CD solution. All the files will be located in the “iac” folder.
+In this section, we will deploy the necessary resources to run our application and the CI/CD solution. All the files will be in the “iac” folder.
 https://github.com/joemaster9/timeoff-management-application/tree/master/iac
 
 First of all we will need to create an Cloudformation Stack with the “amazon-lab-vpc.yaml” template, this stack will create all the necessary networking services that will be used for the rest for the rest of the services.
 
-The second part of this deployment will be the “template.yaml” template that will contain the infrastructure necessary to run CI/CD services and our application successfully. 
+The second part of this deployment will be the “template.yaml” template that will contain the infrastructure necessary to run CI/CD services and our application successfully.
 
 ## Feedback
 
