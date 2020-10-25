@@ -172,8 +172,6 @@ Resources:
       Tags:
       - Key: Name
         Value: !Sub "${AWS::StackName}-Subnet03Lab-Public"
-      - Key: "Capacitacion"
-        Value: "Cloudformation" 
 
   Subnet04Test:
     Condition: HasMoreThan2Azs
@@ -192,8 +190,6 @@ Resources:
       Tags:
       - Key: Name
         Value: !Sub "${AWS::StackName}-Subnet04Lab-Private"
-      - Key: "Capacitacion"
-        Value: "Cloudformation" 
 
   Subnet01RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
