@@ -16,39 +16,8 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
-
-#########################################################
-
-# version: 0.2
-
-# phases: 
-#   pre_build: 
-#     commands: 
-#     - echo Logging in to Amazon ECR.... 
-#     - aws --version
-#     # update the following line with your own region
-#     - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-#     - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-#     - IMAGE_TAG=${COMMIT_HASH:=latest}
-#     - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
-#   build: 
-#     commands: 
-#     - echo Build started on `date` 
-#     - echo Building the Docker image... 
-#     # update the following line with the name of your own ECR repository
-#     - docker build -t $REPOSITORY_URI:latest .
-#     # update the following line with the URI of your own ECR repository (view the Push Commands in the console)
-#     - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG 
-#   post_build: 
-#     commands: 
-#     - echo Build completed on `date` 
-#     - echo pushing to repo
-#     # update the following line with the URI of your own ECR repository
-#     - docker push $REPOSITORY_URI:latest
-#     - docker push $REPOSITORY_URI:$IMAGE_TAG
-#     - echo Writing image definitions file... 
-#     #- printf '[{"ImageURI":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
-#     - printf '{"ImageURI":"%s"}' $REPOSITORY_URI:$IMAGE_TAG > imageDetail.json
-# artifacts:
-#   files:
-#     - imageDetail.json
+      - printf '[{"name":"timeoff-mgmt-app-container","imageUri":"%s"}]' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json 
+  artifacts:
+    files:
+      - imagedefinitions.json
