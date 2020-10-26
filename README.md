@@ -146,17 +146,17 @@ AWS CloudFormation gives you an easy way to model a collection of related AWS an
 
 ## Diagrams
 
-The Following diagram shows the CI/CD flow used for this scenario 
+The following diagram shows the CI/CD flow used for this scenario 
 ![Pipeline_Diagram](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.jpg)
 
-The Following diagram shows the Infrastructure used for this scenario
+The following diagram shows the Infrastructure used for this scenario
 ![Architecture_Diagram](https://github.com/joemaster9/timeoff-management-application/blob/master/img/architecture.jpg)
 
 ## Deploying the infrastructure
 
 ### Prerequisites 
 
-Because we will integrate a GitHub repository with AWS CodeBuild, first, me must create a connection between these 2 platforms. For this we’ll follow the steps that are defined in the following documentation:
+Because we will integrate a GitHub repository with AWS Services, first, me must create a connection between these 2 platforms. For this we’ll follow the steps that are defined in the following documentation:
 
 https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
 
