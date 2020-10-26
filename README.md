@@ -171,7 +171,7 @@ The ARN of this connection will be used in the CodeBuild Service Role to allow a
 In this section, we will deploy the necessary resources to run our application and the CI/CD solution. All the files will be in the “iac” folder.
 ![Infrastructure _Code](https://github.com/joemaster9/timeoff-management-application/blob/master/img/iac-snapshot.png)
 
-First of all we will need to create an Cloudformation Stack with the “amazon-lab-vpc.yaml” template, this stack will create all the necessary networking services that will be used for the rest for the rest of the services.
+First of all we will need to create an Cloudformation Stack with the “amazon-lab-vpc.yaml” template, this stack will create all the necessary networking services that will be used for the rest of the infrastructure.
 
 The second part of this deployment will be the “template.yaml” template that will contain the infrastructure necessary to run CI/CD services and our application successfully.
 
