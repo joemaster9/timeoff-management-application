@@ -147,7 +147,8 @@ AWS CloudFormation gives you an easy way to model a collection of related AWS an
 ## Diagrams
 
 The Following diagram shows the CI/CD flow used for this scenario 
-(IMAGEN)
+![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.png)
+![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.jpg)
 
 The Following diagram shows the Infrastructure used for this scenario
 (IMAGEN)
