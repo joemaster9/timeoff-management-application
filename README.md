@@ -147,11 +147,10 @@ AWS CloudFormation gives you an easy way to model a collection of related AWS an
 ## Diagrams
 
 The Following diagram shows the CI/CD flow used for this scenario 
-![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.png)
-![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.jpg)
+![Pipeline_Diagram](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.jpg)
 
 The Following diagram shows the Infrastructure used for this scenario
-(IMAGEN)
+![Architecture_Diagram](https://github.com/joemaster9/timeoff-management-application/blob/master/img/architecture.jpg)
 
 ## Deploying the infrastructure
 
@@ -170,7 +169,7 @@ The ARN of this connection will be used in the CodeBuild Service Role to allow a
 ### Deploying the infrastructure as code on AWS
 
 In this section, we will deploy the necessary resources to run our application and the CI/CD solution. All the files will be in the “iac” folder.
-![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/iac-snapshot.png)
+![Infrastructure _Code](https://github.com/joemaster9/timeoff-management-application/blob/master/img/iac-snapshot.png)
 
 First of all we will need to create an Cloudformation Stack with the “amazon-lab-vpc.yaml” template, this stack will create all the necessary networking services that will be used for the rest for the rest of the services.
 
@@ -211,12 +210,12 @@ artifacts:
 ```
 
 When all the process is done, we can check that the Pipeline’s stages where executed successfully in the AWS console
-![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/pipeline-snapshot.png)
+![Pipeline_Screenshot](https://github.com/joemaster9/timeoff-management-application/blob/master/img/pipeline-snapshot.png)
 
 Lastly, we can see the application running in our browser thanks to the DNS created by the Application Load Balancer.
 
 URL: http://timeoff-mgm-app-alb-804067693.us-east-1.elb.amazonaws.com
-![GitHub_Connection](https://github.com/joemaster9/timeoff-management-application/blob/master/img/app-screenshot.png)
+![Application_Screenshot](https://github.com/joemaster9/timeoff-management-application/blob/master/img/app-screenshot.png)
 
 
 ## Feedback
