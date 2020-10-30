@@ -146,17 +146,17 @@ AWS CloudFormation gives you an easy way to model a collection of related AWS an
 
 ## Diagrams
 
-The Following diagram shows the CI/CD flow used for this scenario 
+The following diagram shows the CI/CD flow used for this scenario 
 ![Pipeline_Diagram](https://github.com/joemaster9/timeoff-management-application/blob/master/img/diagram.jpg)
 
-The Following diagram shows the Infrastructure used for this scenario
+The following diagram shows the Infrastructure used for this scenario
 ![Architecture_Diagram](https://github.com/joemaster9/timeoff-management-application/blob/master/img/architecture.jpg)
 
 ## Deploying the infrastructure
 
 ### Prerequisites 
 
-Because we will integrate a GitHub repository with AWS CodeBuild, first, me must create a connection between these 2 platforms. For this we’ll follow the steps that are defined in the following documentation:
+Because we will integrate a GitHub repository with AWS Services, first, me must create a connection between these 2 platforms. For this we’ll follow the steps that are defined in the following documentation:
 
 https://docs.aws.amazon.com/codepipeline/latest/userguide/connections-github.html
 
@@ -171,7 +171,7 @@ The ARN of this connection will be used in the CodeBuild Service Role to allow a
 In this section, we will deploy the necessary resources to run our application and the CI/CD solution. All the files will be in the “iac” folder.
 ![Infrastructure _Code](https://github.com/joemaster9/timeoff-management-application/blob/master/img/iac-snapshot.png)
 
-First of all we will need to create an Cloudformation Stack with the “amazon-lab-vpc.yaml” template, this stack will create all the necessary networking services that will be used for the rest for the rest of the services.
+First of all we will need to create an Cloudformation Stack with the “amazon-lab-vpc.yaml” template, this stack will create all the necessary networking services that will be used for the rest of the infrastructure.
 
 The second part of this deployment will be the “template.yaml” template that will contain the infrastructure necessary to run CI/CD services and our application successfully.
 
